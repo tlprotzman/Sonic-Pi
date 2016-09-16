@@ -21,6 +21,15 @@ live_loop :riff_one do
 end
 
 live_loop :drums_one do
-  sample :bd_haus, rate: 0.8, amp: 2
+  #stop
+  sample :bd_haus, rate: 0.9, amp: 2
   sleep 1
 end
+
+live_loop :drums_two do
+  #stop
+  sleep 1
+  sample :drum_snare_soft, rate: 1.5, amp: 1.5
+  sleep 1
+end# Welcome to Sonic Pi v2.10
+
