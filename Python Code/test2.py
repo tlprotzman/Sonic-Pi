@@ -2,31 +2,55 @@ import random
 from psonic import *
 from threading import Thread
 
-key =  [C4,    A3,    F3,    G3]
-type = [MAJOR, MINOR, MAJOR, MAJOR]
-notes = [E4, C4, 
-		 C4, A3,
-		 A3, F3,
-		 D4, G4]
+CHORDS =  [[1,  MAJOR],
+		   [6,	MINOR],
+		   [4,  MAJOR],
+		   [5,  MAJOR]]
+
+KEY = A3
+
+INTERVALS = {	MAJOR : {  1  :  0,
+						   2  :  2,
+			     		   3  :  4,
+						   4  :  5,
+						   5  :  7,
+						   6  :  9,
+						   7  :  11  },
+						   
+				MINOR : {  1  :  0,
+						   2  :  2,
+					  	   3  :  3,
+						   4  :  5,
+						   5  :  7,
+						   6  :  8,
+						   7  :  10  }}
 
 bpm = 80
 bpm = 60 / bpm
 
+def playChord(i):
+	play(chord(chords[i][0], chords[i][1]))
+	
+def playNote(note, interval):
+	baseNote =  CHORDS[note][0]
+	chordType = CHORDS[note][1]
+	play(KEY + INTERVALS[chordType][baseNote] + INTERVALS[chordType][interval])
 
 def bassLine():
 	while True:
 		for i in range(4):
-			play(chord(key[i], type[i]), sustain=1.5)
-			sleep(2)
-		
+			playChord(i)
+			sleep(bpm*2)
+
 def melody():
 	while True:
 		for i in range(4):
 			for j in range(2):
-				play(notes[i*2-1])
-				sleep(0.5)
-				play(notes[i*2])
-				sleep(0.5)
+				playNote(i, 3)
+				sleep(bpm/2)
+				playNote(i, 1)
+				sleep(bpm/2)
+				
 def mainLine():
 	note = 60
 	while True:
@@ -61,40 +85,22 @@ def pickNote(note):
 
 def drumLoop():
 	while True:
-		print(currentBeat)
+		# print(currentBeat)
 		sample(DRUM_HEAVY_KICK)
 		sleep(bpm)
 	# while True:
 	# 	sample(LOOP_AMEN)
 	# 	sleep(0.877)
 
-def trackBeat():
-	beatsPerMeasure = 4
-	while True:
-		print(currentBeat)
-		sleep(bpm)
-		if currentBeat < beatsPerMeasure:
-			currentBeat += 1
-		else:
-			currentBeat = 1
-	
-
-currentBeat = 1
-
 melody_thread = Thread(target=melody)
 bassLine_thread = Thread(target=bassLine)
 mainLine_thread = Thread(target=mainLine)
 mainLine_thread2 = Thread(target=mainLine)
 drum_thread = Thread(target=drumLoop)
-beat_thread = Thread(target = trackBeat)
 
-
-
-
-beat_thread.start()
-# melody_thread.start()
-# bassLine_thread.start()
-mainLine_thread.start()
+melody_thread.start()
+bassLine_thread.start()
+# mainLine_thread.start()
 # mainLine_thread2.start()
 drum_thread.start()
 
