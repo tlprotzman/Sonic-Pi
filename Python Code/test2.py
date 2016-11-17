@@ -2,12 +2,19 @@ import random
 from psonic import *
 from threading import Thread
 
+
 CHORDS =  [[1,  MAJOR],
 		   [6,	MINOR],
 		   [4,  MAJOR],
 		   [5,  MAJOR]]
 
-KEY = A3
+'''
+CHORDS =  [[1,  MAJOR],
+		   [5,	MAJOR],
+		   [6,  MINOR],
+		   [4,  MAJOR]]
+'''
+KEY = C4
 
 INTERVALS = {	MAJOR : {  1  :  0,
 						   2  :  2,
@@ -15,7 +22,8 @@ INTERVALS = {	MAJOR : {  1  :  0,
 						   4  :  5,
 						   5  :  7,
 						   6  :  9,
-						   7  :  11  },
+						   7  :  11,
+						   8  :  12},
 						   
 				MINOR : {  1  :  0,
 						   2  :  2,
@@ -23,19 +31,33 @@ INTERVALS = {	MAJOR : {  1  :  0,
 						   4  :  5,
 						   5  :  7,
 						   6  :  8,
-						   7  :  10  }}
+						   7  :  10, 
+						   8  :  12}}
 
 bpm = 80
 bpm = 60 / bpm
 
 def playChord(i):
-	play(chord(chords[i][0], chords[i][1]))
+	play(chord(KEY+INTERVALS[CHORDS[i][1]][CHORDS[i][0]], CHORDS[i][1]))
 	
-def playNote(note, interval):
+def playNote(note, interval, octave = 0):
 	baseNote =  CHORDS[note][0]
 	chordType = CHORDS[note][1]
-	play(KEY + INTERVALS[chordType][baseNote] + INTERVALS[chordType][interval])
+	actualInterval = 1
+	if interval > 0:
+		actualInterval = interval%8 + interval//8
+	elif interval < 0:
+		actualInterval = 8 - interval%8 - interval//8
+	if actualInterval > 8:
+		actualInterval = 8
+	play(KEY + INTERVALS[chordType][baseNote] + INTERVALS[chordType][actualInterval] + octave*12 + 12*(interval//8))
 
+def playScale():
+	while True:
+		for i in range(0, -100, -1):
+			playNote(1, i+1)
+			sleep(bpm/2)
+			
 def bassLine():
 	while True:
 		for i in range(4):
@@ -92,12 +114,14 @@ def drumLoop():
 	# 	sample(LOOP_AMEN)
 	# 	sleep(0.877)
 
+scale_thread = Thread(target=playScale)
 melody_thread = Thread(target=melody)
 bassLine_thread = Thread(target=bassLine)
 mainLine_thread = Thread(target=mainLine)
 mainLine_thread2 = Thread(target=mainLine)
 drum_thread = Thread(target=drumLoop)
 
+# scale_thread.start()
 melody_thread.start()
 bassLine_thread.start()
 # mainLine_thread.start()
