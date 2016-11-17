@@ -3,17 +3,16 @@ from psonic import *
 from threading import Thread
 
 
-'''
-CHORDS =  [[1,  MAJOR],
-		   [6,	MINOR],
-		   [4,  MAJOR],
-		   [5,  MAJOR]]
+CHORDPROGRESSIONS = [[[1,  MAJOR],
+					  [6,	MINOR],
+					  [4,  MAJOR],
+					  [5,  MAJOR]]
 
-CHORDS =  [[1,  MAJOR],
-		   [5,	MAJOR],
-		   [6,  MINOR],
-		   [4,  MAJOR]]
-'''
+					 [[1,  MAJOR],
+			     	  [5,	MAJOR],
+					  [6,  MINOR],
+					  [4,  MAJOR]]]
+					  
 CHORDS = []
 KEY = 0
 
@@ -38,15 +37,9 @@ INTERVALS = {	MAJOR : {  1  :  0,
 bpm = 80
 bpm = 60 / bpm
 
-
-
-
 def initizalizeChords(CHORDS):
 	print("BAM!")
-	CHORDS =  [[1,  MAJOR],
-			   [2,	MAJOR],
-			   [3,  MINOR],
-			   [3,  MAJOR]]
+	CHORDS = CHORDPROGRESSIONS[0]
 	KEY = A4
 	print(CHORDS, KEY)
 	return (CHORDS, KEY)
