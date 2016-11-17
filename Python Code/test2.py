@@ -3,17 +3,7 @@ from psonic import *
 from threading import Thread
 
 
-'''
-CHORDS =  [[1,  MAJOR],
-		   [6,	MINOR],
-		   [4,  MAJOR],
-		   [5,  MAJOR]]
 
-CHORDS =  [[1,  MAJOR],
-		   [5,	MAJOR],
-		   [6,  MINOR],
-		   [4,  MAJOR]]
-'''
 INTERVALS = {	MAJOR : {  1  :  0,
 						   2  :  2,
 						   3  :  4,
