@@ -3,22 +3,23 @@ from psonic import *
 from threading import Thread
 
 
+'''
 CHORDS =  [[1,  MAJOR],
 		   [6,	MINOR],
 		   [4,  MAJOR],
 		   [5,  MAJOR]]
 
-'''
 CHORDS =  [[1,  MAJOR],
 		   [5,	MAJOR],
 		   [6,  MINOR],
 		   [4,  MAJOR]]
 '''
-KEY = C4
+CHORDS = []
+KEY = 0
 
 INTERVALS = {	MAJOR : {  1  :  0,
 						   2  :  2,
-			     		   3  :  4,
+						   3  :  4,
 						   4  :  5,
 						   5  :  7,
 						   6  :  9,
@@ -27,7 +28,7 @@ INTERVALS = {	MAJOR : {  1  :  0,
 						   
 				MINOR : {  1  :  0,
 						   2  :  2,
-					  	   3  :  3,
+						   3  :  3,
 						   4  :  5,
 						   5  :  7,
 						   6  :  8,
@@ -36,6 +37,19 @@ INTERVALS = {	MAJOR : {  1  :  0,
 
 bpm = 80
 bpm = 60 / bpm
+
+
+
+
+def initizalizeChords(CHORDS):
+	print("BAM!")
+	CHORDS =  [[1,  MAJOR],
+			   [2,	MAJOR],
+			   [3,  MINOR],
+			   [3,  MAJOR]]
+	KEY = A4
+	print(CHORDS, KEY)
+	return (CHORDS, KEY)
 
 def playChord(i):
 	play(chord(KEY+INTERVALS[CHORDS[i][1]][CHORDS[i][0]], CHORDS[i][1]))
@@ -114,6 +128,12 @@ def drumLoop():
 	# 	sample(LOOP_AMEN)
 	# 	sleep(0.877)
 
+
+
+keyInfo = initizalizeChords(CHORDS)
+CHORDS = keyInfo[0]
+KEY	= keyInfo[1]
+print(CHORDS, KEY)
 scale_thread = Thread(target=playScale)
 melody_thread = Thread(target=melody)
 bassLine_thread = Thread(target=bassLine)
