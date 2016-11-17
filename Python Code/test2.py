@@ -14,9 +14,6 @@ CHORDS =  [[1,  MAJOR],
 		   [6,  MINOR],
 		   [4,  MAJOR]]
 '''
-CHORDS = []
-KEY = 0
-
 INTERVALS = {	MAJOR : {  1  :  0,
 						   2  :  2,
 						   3  :  4,
@@ -35,21 +32,22 @@ INTERVALS = {	MAJOR : {  1  :  0,
 						   7  :  10, 
 						   8  :  12}}
 
-bpm = 80
-bpm = 60 / bpm
 
 
 
 
-def initizalizeChords(CHORDS):
-	print("BAM!")
+def initizalizeChords():
 	CHORDS =  [[1,  MAJOR],
 			   [2,	MAJOR],
 			   [3,  MINOR],
-			   [3,  MAJOR]]
+			   [3,  MAJOR],
+			   [5,  MAJOR],
+			   [6,  MAJOR],
+			   [7,  MAJOR],
+			   [8,  MAJOR]]
 	KEY = A4
-	print(CHORDS, KEY)
-	return (CHORDS, KEY)
+	BPM = 80
+	return (CHORDS, KEY, 60 / BPM)
 
 def playChord(i):
 	play(chord(KEY+INTERVALS[CHORDS[i][1]][CHORDS[i][0]], CHORDS[i][1]))
@@ -70,30 +68,29 @@ def playScale():
 	while True:
 		for i in range(0, -100, -1):
 			playNote(1, i+1)
-			sleep(bpm/2)
+			sleep(BPM/2)
 			
 def bassLine():
 	while True:
-		for i in range(4):
+		for i in range(len(CHORDS)):
 			playChord(i)
-			sleep(bpm*2)
+			sleep(BPM*2)
 
 def melody():
 	while True:
-		for i in range(4):
+		for i in range(len(CHORDS)):
 			for j in range(2):
 				playNote(i, 3)
-				sleep(bpm/2)
+				sleep(BPM/2)
 				playNote(i, 1)
-				sleep(bpm/2)
+				sleep(BPM/2)
 				
 def mainLine():
 	note = 60
 	while True:
 		for i in range(2):
-			use_synth(PROPHET)
 			play(note, attack = .1, release = random.random() * .2 + .2)
-			sleep(bpm)
+			sleep(BPM)
 		note = pickNote(note)
 
 def pickNote(note):
@@ -123,16 +120,17 @@ def drumLoop():
 	while True:
 		# print(currentBeat)
 		sample(DRUM_HEAVY_KICK)
-		sleep(bpm)
+		sleep(BPM)
 	# while True:
 	# 	sample(LOOP_AMEN)
 	# 	sleep(0.877)
 
 
 
-keyInfo = initizalizeChords(CHORDS)
+keyInfo = initizalizeChords()
 CHORDS = keyInfo[0]
 KEY	= keyInfo[1]
+BPM = keyInfo[2]
 print(CHORDS, KEY)
 scale_thread = Thread(target=playScale)
 melody_thread = Thread(target=melody)
