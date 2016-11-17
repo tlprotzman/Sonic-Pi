@@ -2,7 +2,14 @@ import random
 from psonic import *
 from threading import Thread
 
-
+CHORDPROGRESSIONS = [ [[1,  MAJOR],
+					   [2,	MAJOR],
+					   [3,  MINOR],
+					   [3,  MAJOR],
+					   [5,  MAJOR],
+					   [6,  MAJOR],
+					   [7,  MAJOR],
+					   [8,  MAJOR]] ]
 
 INTERVALS = {	MAJOR : {  1  :  0,
 						   2  :  2,
@@ -22,19 +29,8 @@ INTERVALS = {	MAJOR : {  1  :  0,
 						   7  :  10, 
 						   8  :  12}}
 
-
-
-
-
 def initizalizeChords():
-	CHORDS =  [[1,  MAJOR],
-			   [2,	MAJOR],
-			   [3,  MINOR],
-			   [3,  MAJOR],
-			   [5,  MAJOR],
-			   [6,  MAJOR],
-			   [7,  MAJOR],
-			   [8,  MAJOR]]
+	CHORDS =  CHORDPROGRESSIONS[0]
 	KEY = A4
 	BPM = 80
 	return (CHORDS, KEY, 60 / BPM)
@@ -52,21 +48,21 @@ def playNote(note, interval, octave = 0):
 		actualInterval = 8 - interval%8 - interval//8
 	if actualInterval > 8:
 		actualInterval = 8
-	play(KEY + INTERVALS[chordType][baseNote] + INTERVALS[chordType][actualInterval] + octave*12 + 12*(interval//8))
-
+	play ( KEY + INTERVALS[chordType][baseNote] + INTERVALS[chordType][actualInterval] + octave*12 + 12*(interval//8) )
+	
 def playScale():
 	while True:
 		for i in range(0, -100, -1):
 			playNote(1, i+1)
 			sleep(BPM/2)
-			
+
 def bassLine():
 	while True:
 		for i in range(len(CHORDS)):
 			playChord(i)
 			sleep(BPM*2)
 
-def melody():
+def background():
 	while True:
 		for i in range(len(CHORDS)):
 			for j in range(2):
@@ -74,7 +70,7 @@ def melody():
 				sleep(BPM/2)
 				playNote(i, 1)
 				sleep(BPM/2)
-				
+
 def mainLine():
 	note = 60
 	while True:
@@ -115,22 +111,20 @@ def drumLoop():
 	# 	sample(LOOP_AMEN)
 	# 	sleep(0.877)
 
-
-
 keyInfo = initizalizeChords()
 CHORDS = keyInfo[0]
 KEY	= keyInfo[1]
 BPM = keyInfo[2]
 print(CHORDS, KEY)
 scale_thread = Thread(target=playScale)
-melody_thread = Thread(target=melody)
+background_thread = Thread(target=background)
 bassLine_thread = Thread(target=bassLine)
 mainLine_thread = Thread(target=mainLine)
 mainLine_thread2 = Thread(target=mainLine)
 drum_thread = Thread(target=drumLoop)
 
 # scale_thread.start()
-melody_thread.start()
+background_thread.start()
 bassLine_thread.start()
 # mainLine_thread.start()
 # mainLine_thread2.start()
