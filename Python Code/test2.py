@@ -1,16 +1,16 @@
+'''IMPORT NECESSARY LIBRARIES'''
 import random
+import math
 from psonic import *
 from threading import Thread
 
+'''LIST OF CHORD PROGRESSIONS'''
 CHORDPROGRESSIONS = [ [[1,  MAJOR],
-					   [2,	MAJOR],
-					   [3,  MINOR],
-					   [3,  MAJOR],
-					   [5,  MAJOR],
-					   [6,  MAJOR],
-					   [7,  MAJOR],
-					   [8,  MAJOR]] ]
+					   [6,  MINOR],
+					   [4,  MAJOR],
+					   [5,  MAJOR]] ]
 
+'''LIST OF INTERVALS'''
 INTERVALS = {	MAJOR : {  1  :  0,
 						   2  :  2,
 						   3  :  4,
@@ -29,12 +29,26 @@ INTERVALS = {	MAJOR : {  1  :  0,
 						   7  :  10, 
 						   8  :  12}}
 
+'''INITIALIZERS'''
 def initizalizeChords():
 	CHORDS =  CHORDPROGRESSIONS[0]
 	KEY = A4
-	BPM = 80
+	BPM = 60
 	return (CHORDS, KEY, 60 / BPM)
+	
+def initializeBackground():
+	mainBackNotes = []
+	lastBackNotes = []
+	possibleNotes = [1, 3, 5]
+	n1 = math.floor(1 + random.random()*4)
+	n2 = math.floor(1 + random.random()*4)
+	for i in range(n1):
+		mainBackNotes.append( possibleNotes[math.floor(random.random()*2)] )
+	for i in range(n2):
+		lastBackNotes.append( possibleNotes[math.floor(random.random()*2)] )
+	return [mainBackNotes, lastBackNotes]
 
+'''PLAY NOTE/CHORD METHODS'''
 def playChord(i):
 	play(chord(KEY+INTERVALS[CHORDS[i][1]][CHORDS[i][0]], CHORDS[i][1]))
 	
@@ -56,6 +70,7 @@ def playScale():
 			playNote(1, i+1)
 			sleep(BPM/2)
 
+'''THREADS'''
 def bassLine():
 	while True:
 		for i in range(len(CHORDS)):
@@ -65,11 +80,12 @@ def bassLine():
 def background():
 	while True:
 		for i in range(len(CHORDS)):
-			for j in range(2):
-				playNote(i, 3)
-				sleep(BPM/2)
-				playNote(i, 1)
-				sleep(BPM/2)
+			backNotes = mainBackNotes
+			if i == len(CHORDS)-1:
+				backNotes = lastBackNotes
+			for j in range(len(backNotes)):
+				playNote(i, backNotes[j])
+				sleep(BPM/len(backNotes))
 
 def mainLine():
 	note = 60
@@ -111,11 +127,20 @@ def drumLoop():
 	# 	sample(LOOP_AMEN)
 	# 	sleep(0.877)
 
+'''INITIALIZE CHORDS'''
 keyInfo = initizalizeChords()
 CHORDS = keyInfo[0]
 KEY	= keyInfo[1]
 BPM = keyInfo[2]
 print(CHORDS, KEY)
+
+'''INITIALIZE BACKGROUNDS'''
+backgroundInfo = initializeBackground()
+mainBackNotes = backgroundInfo[0]
+lastBackNotes = backgroundInfo[1]
+
+
+'''INITIALIZE THREADS'''
 scale_thread = Thread(target=playScale)
 background_thread = Thread(target=background)
 bassLine_thread = Thread(target=bassLine)
@@ -123,12 +148,10 @@ mainLine_thread = Thread(target=mainLine)
 mainLine_thread2 = Thread(target=mainLine)
 drum_thread = Thread(target=drumLoop)
 
+'''START THREADS'''
 # scale_thread.start()
 background_thread.start()
 bassLine_thread.start()
 # mainLine_thread.start()
 # mainLine_thread2.start()
 drum_thread.start()
-
-
-
