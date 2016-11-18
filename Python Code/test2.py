@@ -8,7 +8,13 @@ from threading import Thread
 CHORDPROGRESSIONS = [ [[1,  MAJOR],
 					   [6,  MINOR],
 					   [4,  MAJOR],
-					   [5,  MAJOR]] ]
+					   [5,  MAJOR]],
+
+					  [[1,  MAJOR],
+					   [4,  MAJOR],
+					   [5,  MAJOR],
+					   [4,  MAJOR]]
+					]
 
 '''LIST OF INTERVALS'''
 INTERVALS = {	MAJOR : {  1  :  0,
@@ -31,7 +37,7 @@ INTERVALS = {	MAJOR : {  1  :  0,
 
 '''INITIALIZERS'''
 def initizalizeChords():
-	CHORDS =  CHORDPROGRESSIONS[0]
+	CHORDS =  CHORDPROGRESSIONS[random.randint(0, len(CHORDPROGRESSIONS)-1)]
 	KEY = A4
 	BPM = 60
 	return (CHORDS, KEY, 60 / BPM)
@@ -40,12 +46,12 @@ def initializeBackground():
 	mainBackNotes = []
 	lastBackNotes = []
 	possibleNotes = [1, 3, 5]
-	n1 = math.floor(1 + random.random()*4)
-	n2 = math.floor(1 + random.random()*4)
+	n1 = random.randint(1, 4)
+	n2 = random.randint(1, 4)
 	for i in range(n1):
-		mainBackNotes.append( possibleNotes[math.floor(random.random()*2)] )
+		mainBackNotes.append( possibleNotes[random.randint(0, 2)] )
 	for i in range(n2):
-		lastBackNotes.append( possibleNotes[math.floor(random.random()*2)] )
+		lastBackNotes.append( possibleNotes[random.randint(0, 2)] )
 	return [mainBackNotes, lastBackNotes]
 
 '''PLAY NOTE/CHORD METHODS'''
@@ -65,17 +71,16 @@ def playNote(note, interval, octave = 0):
 	play ( KEY + INTERVALS[chordType][baseNote] + INTERVALS[chordType][actualInterval] + octave*12 + 12*(interval//8) )
 	
 def playScale():
-	while True:
-		for i in range(0, -100, -1):
-			playNote(1, i+1)
-			sleep(BPM/2)
+	for i in range(8):
+		playNote(1, i+1)
+		sleep(BPM/2)
 
 '''THREADS'''
 def bassLine():
 	while True:
 		for i in range(len(CHORDS)):
 			playChord(i)
-			sleep(BPM*2)
+			sleep(BPM)
 
 def background():
 	while True:
@@ -152,6 +157,6 @@ drum_thread = Thread(target=drumLoop)
 # scale_thread.start()
 background_thread.start()
 bassLine_thread.start()
-# mainLine_thread.start()
+mainLine_thread.start()
 # mainLine_thread2.start()
 drum_thread.start()
