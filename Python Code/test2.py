@@ -91,7 +91,7 @@ def initializeBackground():
 	for i in range(n2):
 		lastBackNotes.append( possibleNotes[random.randint(0, 2)] )
 	return [mainBackNotes, lastBackNotes]
-	
+
 def initializeChorus():
 	CHORUS = []
 	numBars = random.randint(2, 4)*len(CHORDS)
@@ -101,13 +101,14 @@ def initializeChorus():
 			CHORUS.append(CHORUS[len(CHORUS)-2])
 			CHORUS.append(CHORUS[len(CHORUS)-2])
 			i = i + 2
-		elif random.randint(1,3)==1:
+		elif i==0 or random.randint(1,3)==1:
 			CHORUS.append([1])
 		else:
 			line = []
-			n = random.randint(3, 4)
+			n = random.randint(2, 3)
+			line.append(possibleNotes[random.randint(0, 2)])
 			for j in range(n):
-				line.append( random.randint(1, 7) )
+				line.append( pickNote(line[len(line)-1]) )
 			CHORUS.append(line)
 	return CHORUS
 
