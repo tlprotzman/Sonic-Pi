@@ -13,7 +13,30 @@ CHORDPROGRESSIONS = [ [[1,  MAJOR],
 					  [[1,  MAJOR],
 					   [4,  MAJOR],
 					   [5,  MAJOR],
-					   [4,  MAJOR]]
+					   [4,  MAJOR]],
+
+					  [[1, MAJOR],
+					   [2, MAJOR],
+					   [3, MINOR],
+					   [3, MAJOR],
+					   [5, MAJOR],
+					   [6, MINOR],
+					   [7, MAJOR],
+					   [8, MAJOR]],
+
+					  [[1, MAJOR],
+					   [4, MAJOR],
+					   [2, MINOR],
+					   [3, MINOR],
+					   [4, MAJOR],
+					   [1, MAJOR],
+					   [2, MINOR],
+					   [5, MAJOR]],
+
+					  [[1, MAJOR],
+					   [4, MAJOR],
+					   [5, MAJOR],
+					   [1, MAJOR]]
 					]
 
 '''LIST OF INTERVALS'''
@@ -35,10 +58,25 @@ INTERVALS = {	MAJOR : {  1  :  0,
 						   7  :  10, 
 						   8  :  12}}
 
+BACKGROUNDSYNTHS = [DTRI,
+		  GROWL,
+		  PIANO,
+		  PROPHET,
+		  TRI,
+		  SUBPULSE]
+
+'''
+POSSIBLE SYNTHS
+DTRI
+GROWL
+PIANO
+PROPHET
+'''
+
 '''INITIALIZERS'''
 def initizalizeChords():
 	CHORDS =  CHORDPROGRESSIONS[random.randint(0, len(CHORDPROGRESSIONS)-1)]
-	KEY = A4
+	KEY = A3
 	BPM = 60
 	return (CHORDS, KEY, 60 / BPM)
 	
@@ -55,10 +93,12 @@ def initializeBackground():
 	return [mainBackNotes, lastBackNotes]
 
 '''PLAY NOTE/CHORD METHODS'''
-def playChord(i):
-	play(chord(KEY+INTERVALS[CHORDS[i][1]][CHORDS[i][0]], CHORDS[i][1]))
+def playChord(i, synth):
+	use_synth(synth)
+	play(chord(KEY+INTERVALS[CHORDS[i][1]][CHORDS[i][0]], CHORDS[i][1]), sustain = BPM/2)
 	
-def playNote(note, interval, octave = 0):
+def playNote(note, interval, synth, octave = 0):
+	use_synth(synth)
 	baseNote =  CHORDS[note][0]
 	chordType = CHORDS[note][1]
 	actualInterval = 1
@@ -77,19 +117,23 @@ def playScale():
 
 '''THREADS'''
 def bassLine():
+	bassLineSynth = random.randint(0, len(BACKGROUNDSYNTHS) - 1)
+	print("bassline synth:", bassLineSynth)
 	while True:
 		for i in range(len(CHORDS)):
-			playChord(i)
+			playChord(i, BACKGROUNDSYNTHS[bassLineSynth])
 			sleep(BPM)
 
 def background():
+	backgroundSynth = random.randint(0, len(BACKGROUNDSYNTHS)) - 1
+	print("background synth:", backgroundSynth)
 	while True:
 		for i in range(len(CHORDS)):
 			backNotes = mainBackNotes
 			if i == len(CHORDS)-1:
 				backNotes = lastBackNotes
 			for j in range(len(backNotes)):
-				playNote(i, backNotes[j])
+				playNote(i, backNotes[j], BACKGROUNDSYNTHS[backgroundSynth])
 				sleep(BPM/len(backNotes))
 
 def mainLine():
@@ -157,6 +201,6 @@ drum_thread = Thread(target=drumLoop)
 # scale_thread.start()
 background_thread.start()
 bassLine_thread.start()
-mainLine_thread.start()
+# mainLine_thread.start()
 # mainLine_thread2.start()
 drum_thread.start()
