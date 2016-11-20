@@ -25,7 +25,7 @@ INTERVALS = {	MAJOR : {  1  :  0,
 						   6  :  9,
 						   7  :  11,
 						   8  :  12},
-						   
+
 				MINOR : {  1  :  0,
 						   2  :  2,
 						   3  :  3,
@@ -53,6 +53,26 @@ def initializeBackground():
 	for i in range(n2):
 		lastBackNotes.append( possibleNotes[random.randint(0, 2)] )
 	return [mainBackNotes, lastBackNotes]
+
+	
+def initializeChorus():
+	CHORUS = []
+	numBars = random.randint(3,6)*len(CHORDS)
+	possibleNotes = [1, 3, 5]
+	for i in range(numBars):
+		if i > 1 and i < numBars-2 and random.randint(1,2)==1:
+			CHORUS.append(CHORUS[len(CHORUS)-2])
+			CHORUS.append(CHORUS[len(CHORUS)-2])
+			i = i + 2
+		elif random.randint(1,4)==1:
+			CHORUS.append([possibleNotes[random.randint(0, 2)]])
+		else:
+			line = []
+			n = random.randint(1, 4)
+			for j in range(n):
+				line.append( random.randint(1, 7) )
+			CHORUS.append(line)
+	return CHORUS
 
 '''PLAY NOTE/CHORD METHODS'''
 def playChord(i):
@@ -91,6 +111,13 @@ def background():
 			for j in range(len(backNotes)):
 				playNote(i, backNotes[j])
 				sleep(BPM/len(backNotes))
+
+def playChorus():
+	while True:
+		for i in range(len(CHORUS)):
+			for j in range(len(CHORUS[i])):
+				playNote(i%(len(CHORDS)), CHORUS[i][j])
+				sleep(BPM/len(CHORUS[i]))
 
 def mainLine():
 	note = 60
@@ -144,6 +171,7 @@ backgroundInfo = initializeBackground()
 mainBackNotes = backgroundInfo[0]
 lastBackNotes = backgroundInfo[1]
 
+CHORUS = initializeChorus()
 
 '''INITIALIZE THREADS'''
 scale_thread = Thread(target=playScale)
@@ -152,11 +180,13 @@ bassLine_thread = Thread(target=bassLine)
 mainLine_thread = Thread(target=mainLine)
 mainLine_thread2 = Thread(target=mainLine)
 drum_thread = Thread(target=drumLoop)
+chorus_thread = Thread(target=playChorus)
 
 '''START THREADS'''
 # scale_thread.start()
-background_thread.start()
+#background_thread.start()
 bassLine_thread.start()
-mainLine_thread.start()
+chorus_thread.start()
+# mainLine_thread.start()
 # mainLine_thread2.start()
 drum_thread.start()
