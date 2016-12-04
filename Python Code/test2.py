@@ -1,6 +1,7 @@
 '''IMPORT NECESSARY LIBRARIES'''
 import random
 import math
+import weather
 from psonic import *
 from threading import Thread
 
@@ -18,8 +19,22 @@ CHORDPROGRESSIONS = [ [[1,  MAJOR],
 					  [[1, MAJOR],
 					   [4, MAJOR],
 					   [5, MAJOR],
-					   [1, MAJOR]]
-					 
+					   [1, MAJOR]],
+
+					  [[1, MINOR],
+					   [7, MAJOR],
+					   [6, MAJOR],
+					   [1, MINOR]],
+
+					  [[1, MINOR],
+					   [4, MINOR],
+					   [7, MAJOR],
+					   [1, MINOR]],
+
+					  [[1, MINOR],
+					   [4, MINOR],
+					   [5, MINOR],
+					   [1, MINOR]],					 
 					]
 '''
 					  [[1, MAJOR],
@@ -75,10 +90,19 @@ PROPHET
 
 '''INITIALIZERS'''
 def initizalizeChords():
-	CHORDS =  CHORDPROGRESSIONS[random.randint(0, len(CHORDPROGRESSIONS)-1)]
+	data = weather.getData()
+	print(data)
+	progression = random.randint(0, len(CHORDPROGRESSIONS)-4)
+	if random.randint(0, int(data[1])) > 10:
+		print('MINOR')
+		progression += 3
+	CHORDS =  CHORDPROGRESSIONS[progression]
 	KEY = A3
-	BPM = 60
-	return (CHORDS, KEY, 60 / BPM)
+	BPM = ((data[0] + 23) * 2.4) + 45
+	amplitude = -1 * (data[2]**2 / 192) + (data[2] / 8) + 0.25
+	print(BPM) 
+	print(amplitude)
+	return (CHORDS, KEY, 60 / BPM, amplitude)
 
 def initializeBackground():
 	mainBackNotes = []
@@ -121,7 +145,7 @@ def initializeSynths():
 '''PLAY NOTE/CHORD METHODS'''
 def playChord(i, synth):
 	use_synth(synth)
-	play(chord(KEY+INTERVALS[CHORDS[i][1]][CHORDS[i][0]], CHORDS[i][1]), sustain = BPM/2)
+	play(chord(KEY+INTERVALS[CHORDS[i][1]][CHORDS[i][0]], CHORDS[i][1]), sustain = BPM/2,amp = amplitude)
 	
 def playNote(note, interval, synth, octave = 0):
 	use_synth(synth)
@@ -134,7 +158,7 @@ def playNote(note, interval, synth, octave = 0):
 		actualInterval = 8 - interval%8 - interval//8
 	if actualInterval > 8:
 		actualInterval = 8
-	play ( KEY + INTERVALS[chordType][baseNote] + INTERVALS[chordType][actualInterval] + octave*12 + 12*(interval//8) )
+	play ( KEY + INTERVALS[chordType][baseNote] + INTERVALS[chordType][actualInterval] + octave*12 + 12*(interval//8), amp = amplitude)
 	
 def playScale():
 	for i in range(8):
@@ -169,7 +193,7 @@ def mainLine():
 	note = 60
 	#while True:
 	for i in range(2):
-		play(note, attack = .1, release = random.random() * .2 + .2)
+		play(note, attack = .1, release = random.random() * .2 + .2, amp = amplitude)
 		sleep(BPM)
 	note = pickNote(note)
 
@@ -197,16 +221,38 @@ def pickNote(note):
 	return note
 
 def drumLoop():
-	for i in range(len(CHORDS)):
-		# print(currentBeat)
-		sample(DRUM_HEAVY_KICK)
-		sleep(BPM)
+	if whichDrumLoop == 0:
+		for i in range(len(CHORDS)):
+			sample(DRUM_HEAVY_KICK, amp = amplitude)
+			sleep(BPM/2)
+			sample(DRUM_SNARE_HARD, amp = amplitude)
+			sleep(BPM/2)
+	elif whichDrumLoop == 1:
+		for i in range(len(CHORDS)):
+			sample(DRUM_CYMBAL_CLOSED, amp = amplitude)
+			sample(DRUM_HEAVY_KICK, amp = amplitude)
+			sleep(BPM / 4)
+			sample(DRUM_CYMBAL_CLOSED, amp = amplitude)
+			sleep(BPM / 4)
+			sample(DRUM_CYMBAL_CLOSED, amp = amplitude)
+			sample(DRUM_SNARE_HARD, amp = amplitude)
+			sleep(BPM / 4)
+			sample(DRUM_CYMBAL_CLOSED, amp = amplitude)
+			sleep(BPM / 4)
+	elif whichDrumLoop == 2:
+		for i in range(len(CHORDS)):
+			sample(DRUM_HEAVY_KICK, amp = amplitude)
+			sleep(BPM/2)
+			sample(DRUM_CYMBAL_HARD, amp = amplitude)
+			sleep(BPM/2)
+
 
 '''INITIALIZE CHORDS'''
 keyInfo = initizalizeChords()
 CHORDS = keyInfo[0]
 KEY	= keyInfo[1]
 BPM = keyInfo[2]
+amplitude = keyInfo[3]
 print(CHORDS, KEY)
 
 '''INITIALIZE SYNTHS'''
@@ -219,6 +265,10 @@ backgroundInfo = initializeBackground()
 mainBackNotes = backgroundInfo[0]
 lastBackNotes = backgroundInfo[1]
 
+'''INITIALIZE DRUMS'''
+whichDrumLoop = random.randint(0, 2)
+
+'''INITIALIZE CHORUS'''
 CHORUS = initializeChorus()
 
 '''INITIALIZE THREADS'''
