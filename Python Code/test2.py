@@ -36,25 +36,7 @@ CHORDPROGRESSIONS = [ [[1,  MAJOR],
 					   [5, MINOR],
 					   [1, MINOR]],					 
 					]
-'''
-					  [[1, MAJOR],
-					   [2, MAJOR],
-					   [3, MINOR],
-					   [3, MAJOR],
-					   [5, MAJOR],
-					   [6, MINOR],
-					   [7, MAJOR],
-					   [8, MAJOR]],
 
-					  [[1, MAJOR],
-					   [4, MAJOR],
-					   [2, MINOR],
-					   [3, MINOR],
-					   [4, MAJOR],
-					   [1, MAJOR],
-					   [2, MINOR],
-					   [5, MAJOR]],
-'''
 '''LIST OF INTERVALS'''
 INTERVALS = {	MAJOR : {  1  :  0,
 						   2  :  2,
@@ -76,17 +58,9 @@ INTERVALS = {	MAJOR : {  1  :  0,
 
 BACKGROUNDSYNTHS = [
 		  GROWL,
-		 # PIANO,
 		  TRI,
+		  PIANO,
 		  SUBPULSE]
-
-'''
-POSSIBLE SYNTHS
-DTRI
-GROWL
-PIANO
-PROPHET
-'''
 
 '''INITIALIZERS'''
 def initizalizeChords():
@@ -104,7 +78,7 @@ def initizalizeChords():
 	print(amplitude)
 	return (CHORDS, KEY, 60 / BPM, amplitude)
 
-def initializeBackground():
+def initializeAccompaniment():
 	mainBackNotes = []
 	lastBackNotes = []
 	possibleNotes = [1, 3, 5]
@@ -115,25 +89,25 @@ def initializeBackground():
 	for i in range(n2):
 		lastBackNotes.append( possibleNotes[random.randint(0, 2)] )
 	return [mainBackNotes, lastBackNotes]
-	
-def initializeChorus():
-	CHORUS = []
+
+def initializeMelody():
+	MELODY = []
 	numBars = random.randint(2, 4)*len(CHORDS)
 	possibleNotes = [1, 3, 5]
 	for i in range(numBars):
 		if i > 1 and i < numBars-2 and random.randint(1,2)==1:
-			CHORUS.append(CHORUS[len(CHORUS)-2])
-			CHORUS.append(CHORUS[len(CHORUS)-2])
+			MELODY.append(MELODY[len(MELODY)-2])
+			MELODY.append(MELODY[len(MELODY)-2])
 			i = i + 2
 		elif random.randint(1,3)==1:
-			CHORUS.append([1])
+			MELODY.append([1])
 		else:
 			line = []
 			n = random.randint(3, 4)
 			for j in range(n):
 				line.append( random.randint(1, 7) )
-			CHORUS.append(line)
-	return CHORUS
+			MELODY.append(line)
+	return MELODY
 
 def initializeSynths():
 	bassLineSynth = random.randint(0, len(BACKGROUNDSYNTHS) - 1)
@@ -172,7 +146,7 @@ def bassLine():
 		playChord(i, BACKGROUNDSYNTHS[bassLineSynth])
 		sleep(BPM)
 
-def background():
+def playAccompaniment():
 	#while True:
 	for i in range(len(CHORDS)):
 		backNotes = mainBackNotes
@@ -182,12 +156,12 @@ def background():
 			playNote(i, backNotes[j], BACKGROUNDSYNTHS[backgroundSynth])
 			sleep(BPM/len(backNotes))
 
-def playChorus():
+def playMelody():
 	#while True:
-	for i in range(len(CHORUS)):
-		for j in range(len(CHORUS[i])):
-			playNote(i%(len(CHORDS)), CHORUS[i][j], TRI)
-			sleep(BPM/len(CHORUS[i]))
+	for i in range(len(MELODY)):
+		for j in range(len(MELODY[i])):
+			playNote(i%(len(CHORDS)), MELODY[i][j], TRI)
+			sleep(BPM/len(MELODY[i]))
 
 def mainLine():
 	note = 60
@@ -223,27 +197,27 @@ def pickNote(note):
 def drumLoop():
 	if whichDrumLoop == 0:
 		for i in range(len(CHORDS)):
-			sample(DRUM_HEAVY_KICK, amp = amplitude)
+			sample(DRUM_HEAVY_KICK, amp = amplitude-.2)
 			sleep(BPM/2)
-			sample(DRUM_SNARE_HARD, amp = amplitude)
+			sample(DRUM_SNARE_HARD, amp = amplitude-.2)
 			sleep(BPM/2)
 	elif whichDrumLoop == 1:
 		for i in range(len(CHORDS)):
-			sample(DRUM_CYMBAL_CLOSED, amp = amplitude)
-			sample(DRUM_HEAVY_KICK, amp = amplitude)
+			sample(DRUM_CYMBAL_CLOSED, amp = amplitude-.2)
+			sample(DRUM_HEAVY_KICK, amp = amplitude-.2)
 			sleep(BPM / 4)
-			sample(DRUM_CYMBAL_CLOSED, amp = amplitude)
+			sample(DRUM_CYMBAL_CLOSED, amp = amplitude-.3)
 			sleep(BPM / 4)
-			sample(DRUM_CYMBAL_CLOSED, amp = amplitude)
-			sample(DRUM_SNARE_HARD, amp = amplitude)
+			sample(DRUM_CYMBAL_CLOSED, amp = amplitude-.3)
+			sample(DRUM_SNARE_HARD, amp = amplitude-.2)
 			sleep(BPM / 4)
-			sample(DRUM_CYMBAL_CLOSED, amp = amplitude)
+			sample(DRUM_CYMBAL_CLOSED, amp = amplitude-.3)
 			sleep(BPM / 4)
 	elif whichDrumLoop == 2:
 		for i in range(len(CHORDS)):
-			sample(DRUM_HEAVY_KICK, amp = amplitude)
+			sample(DRUM_HEAVY_KICK, amp = amplitude-.2)
 			sleep(BPM/2)
-			sample(DRUM_CYMBAL_HARD, amp = amplitude)
+			sample(DRUM_CYMBAL_HARD, amp = amplitude-.3)
 			sleep(BPM/2)
 
 
@@ -261,36 +235,34 @@ bassLineSynth = allSynths[0]
 backgroundSynth = allSynths[1]
 
 '''INITIALIZE BACKGROUNDS'''
-backgroundInfo = initializeBackground()
+backgroundInfo = initializeAccompaniment()
 mainBackNotes = backgroundInfo[0]
 lastBackNotes = backgroundInfo[1]
 
 '''INITIALIZE DRUMS'''
 whichDrumLoop = random.randint(0, 2)
 
-'''INITIALIZE CHORUS'''
-CHORUS = initializeChorus()
+'''INITIALIZE MELODY'''
+MELODY = initializeMelody()
 
 '''INITIALIZE THREADS'''
 scale_thread = [ Thread(target=playScale) ]
-background_thread = [ Thread(target=background) ]
+background_thread = [ Thread(target=playAccompaniment) ]
 bassLine_thread = [ Thread(target=bassLine) ]
-mainLine_thread = [ Thread(target=mainLine) ]
-mainLine_thread2 = [ Thread(target=mainLine) ]
 drum_thread = [ Thread(target=drumLoop) ]
-chorus_thread = [ Thread(target=playChorus) ]
+melody_thread = [ Thread(target=playMelody) ]
 
-'''START THREADS'''
+'''SONG MANAGER'''
 
 def songManager():
 	measures = 0
-	chorusPlays = 0
+	melodyPlays = 0
 	
 	while True:
 
 		#background
 		if measures>1:
-			background_thread.append( Thread(target=background) )
+			background_thread.append( Thread(target=playAccompaniment) )
 			background_thread[-1].start()
 		
 		#bassline
@@ -305,12 +277,12 @@ def songManager():
 		#measures
 		measures += 1
 		if measures%(len(CHORDS))==0:
-			chorusPlays += 1
+			melodyPlays += 1
 			
-		#chorus
-		if measures%(len(CHORDS))==0 and chorusPlays > 0:
-			chorus_thread.append( Thread(target=playChorus) )
-			chorus_thread[-1].start()
+		#melody
+		if measures%(len(CHORDS))==0 and melodyPlays > 0:
+			melody_thread.append( Thread(target=playMelody) )
+			melody_thread[-1].start()
 		
 		sleep(BPM*len(CHORDS))
 		
