@@ -56,6 +56,7 @@ INTERVALS = {	MAJOR : {  1  :  0,
 						   7  :  10, 
 						   8  :  12}}
 
+'''LIST OF SYNTHS TO USE'''
 BACKGROUNDSYNTHS = [
 		  GROWL,
 		  TRI,
@@ -64,21 +65,22 @@ BACKGROUNDSYNTHS = [
 
 '''INITIALIZERS'''
 def initizalizeChords():
-	data = weather.getData()
+	data = weather.getData()										#Gets the needed weather and time data
 	print(data)
-	progression = random.randint(0, len(CHORDPROGRESSIONS)-4)
-	if random.randint(0, int(data[1])) > 10:
-		print('MINOR')
+	progression = random.randint(0, len(CHORDPROGRESSIONS)-4)		#Selects a random major chord progression
+	if random.randint(0, int(data[1])) > 10:						#Switches to a minor chord progression on random chance
+		print('MINOR')												#and expected rain over next five days
 		progression += 3
-	CHORDS =  CHORDPROGRESSIONS[progression]
-	KEY = A3
-	BPM = ((data[0] + 23) * 2.4) + 45
-	amplitude = -1 * (data[2]**2 / 192) + (data[2] / 8) + 0.25
+	CHORDS =  CHORDPROGRESSIONS[progression]						#Sets the progression to be used
+	KEY = A3														#Sets the key to be used
+	BPM = ((data[0] + 23) * 2.4) + 45								#Sets the tempo of the piece, mapping -10 to 43 Celsius to 60 to 200 BMP
+	amplitude = -1 * (data[2]**2 / 192) + (data[2] / 8) + 0.25		#Maps the amplitude to the time of day, with noon being loudest
 	print(BPM) 
 	print(amplitude)
 	return (CHORDS, KEY, 60 / BPM, amplitude)
 
-def initializeAccompaniment():
+
+def initializeAccompaniment():										#Sets up the accompaniment to be used
 	mainBackNotes = []
 	lastBackNotes = []
 	possibleNotes = [1, 3, 5]
@@ -118,6 +120,9 @@ def initializeSynths():
 	
 '''PLAY NOTE/CHORD METHODS'''
 def playChord(i, synth):
+	'''
+	Takes a note and a synth, and plays it
+	'''
 	use_synth(synth)
 	play(chord(KEY+INTERVALS[CHORDS[i][1]][CHORDS[i][0]], CHORDS[i][1]), sustain = BPM/2,amp = amplitude)
 	
