@@ -69,7 +69,7 @@ def initizalizeChords():
 	print(data)
 	progression = random.randint(0, len(CHORDPROGRESSIONS)-4)		#Selects a random major chord progression
 	if random.randint(0, int(data[1])) > 10:						#Switches to a minor chord progression on random chance
-		print('MINOR')												#and expected rain over next five days
+		print('MINOR')													#and expected rain over next five days
 		progression += 3
 	CHORDS =  CHORDPROGRESSIONS[progression]						#Sets the progression to be used
 	KEY = A3														#Sets the key to be used
@@ -82,10 +82,10 @@ def initizalizeChords():
 
 def initializeAccompaniment():										#Sets up the accompaniment to be used
 	mainBackNotes = []
-	lastBackNotes = []
-	possibleNotes = [1, 3, 5]
-	n1 = random.randint(1, 4)
-	n2 = random.randint(1, 4)
+	lastBackNotes = []												#The notes are different for the last chord in the progression
+	possibleNotes = [1, 3, 5]										#Plays either a first, third or fifth of the scale
+	n1 = random.randint(1, 4)										#Determine how many notes to play per measure, between 1 (whole note)
+	n2 = random.randint(1, 4)											#and 4 (quarter note)
 	for i in range(n1):
 		mainBackNotes.append( possibleNotes[random.randint(0, 2)] )
 	for i in range(n2):
@@ -93,25 +93,24 @@ def initializeAccompaniment():										#Sets up the accompaniment to be used
 	return [mainBackNotes, lastBackNotes]
 
 def initializeMelody():
-	MELODY = []
-	numBars = random.randint(2, 4)*len(CHORDS)
-	possibleNotes = [1, 3, 5]
+	MELODY = []														#list of one measure sequences
+	numBars = random.randint(2, 4)*len(CHORDS)						#Number of such sequences to exist
 	for i in range(numBars):
-		if i > 1 and i < numBars-2 and random.randint(1,2)==1:
+		if i > 1 and i < numBars-2 and random.randint(1,2)==1:		#Sometimes, repeat the last two bars
 			MELODY.append(MELODY[len(MELODY)-2])
 			MELODY.append(MELODY[len(MELODY)-2])
 			i = i + 2
-		elif random.randint(1,3)==1:
+		elif random.randint(1,3)==1:								#Sometimes, play the tonic for an entire measure
 			MELODY.append([1])
-		else:
-			line = []
+		else:														#Otherwise, create a random phrase of random length
+			line = []				
 			n = random.randint(3, 4)
 			for j in range(n):
 				line.append( random.randint(1, 7) )
 			MELODY.append(line)
 	return MELODY
 
-def initializeSynths():
+def initializeSynths():												#Determine which synths to use, and output them
 	bassLineSynth = random.randint(0, len(BACKGROUNDSYNTHS) - 1)
 	print("bassline synth:", bassLineSynth)
 	backgroundSynth = random.randint(0, len(BACKGROUNDSYNTHS)) - 1
@@ -119,40 +118,32 @@ def initializeSynths():
 	return (bassLineSynth, backgroundSynth)
 	
 '''PLAY NOTE/CHORD METHODS'''
-def playChord(i, synth):
+def playChord(i, synth):											#Play the ith chord in the progression
 	'''
 	Takes a note and a synth, and plays it
 	'''
 	use_synth(synth)
 	play(chord(KEY+INTERVALS[CHORDS[i][1]][CHORDS[i][0]], CHORDS[i][1]), sustain = BPM/2,amp = amplitude)
 	
-def playNote(note, interval, synth, octave = 0):
+def playNote(note, interval, synth, octave = 0):					#Plays a note based on the base and interval
 	use_synth(synth)
 	baseNote =  CHORDS[note][0]
 	chordType = CHORDS[note][1]
 	actualInterval = 1
-	if interval > 0:
+	if interval > 0:												#Modulus allows for octave wrapping
 		actualInterval = interval%8 + interval//8
-	elif interval < 0:
+	elif interval < 0:												#Negative intervals
 		actualInterval = 8 - interval%8 - interval//8
-	if actualInterval > 8:
+	if actualInterval > 8:											#Safety to prevent crashing with invalid intervals
 		actualInterval = 8
 	play ( KEY + INTERVALS[chordType][baseNote] + INTERVALS[chordType][actualInterval] + octave*12 + 12*(interval//8), amp = amplitude)
 	
-def playScale():
-	for i in range(8):
-		playNote(1, i+1)
-		sleep(BPM/2)
-
-'''THREADS'''
-def bassLine():
-	#while True:
+def bassLine():														#Plays chords  in the progression
 	for i in range(len(CHORDS)):
 		playChord(i, BACKGROUNDSYNTHS[bassLineSynth])
 		sleep(BPM)
 
-def playAccompaniment():
-	#while True:
+def playAccompaniment():											#Plays the pre-initialized accompaniment
 	for i in range(len(CHORDS)):
 		backNotes = mainBackNotes
 		if i == len(CHORDS)-1:
@@ -161,50 +152,18 @@ def playAccompaniment():
 			playNote(i, backNotes[j], BACKGROUNDSYNTHS[backgroundSynth])
 			sleep(BPM/len(backNotes))
 
-def playMelody():
-	#while True:
+def playMelody():													#Play the pre-initialized melody
 	for i in range(len(MELODY)):
 		for j in range(len(MELODY[i])):
 			playNote(i%(len(CHORDS)), MELODY[i][j], TRI)
 			sleep(BPM/len(MELODY[i]))
-
-def mainLine():
-	note = 60
-	#while True:
-	for i in range(2):
-		play(note, attack = .1, release = random.random() * .2 + .2, amp = amplitude)
-		sleep(BPM)
-	note = pickNote(note)
-
-def pickNote(note):
-	# print(note)
-	maxNote = 90
-	minNote = 50
-	randomInterval = random.randint(1,3) 
-	direction = random.randint(1, 2)
-	if note >= maxNote:
-		direction = 2
-	elif note <= minNote:
-		direction = 1
-	# print(direction)
-	if randomInterval == 2:
-		if direction == 1:
-			note += 4
-		else:
-			note -= 4
-	elif randomInterval == 3:
-		if direction == 1:
-			note += 7
-		else:
-			note -= 7
-	return note
-
-def drumLoop():
-	if whichDrumLoop == 0:
+			
+def drumLoop():														#Selects a random drum loop to play
+	if whichDrumLoop == 0:	
 		for i in range(len(CHORDS)):
-			sample(DRUM_HEAVY_KICK, amp = amplitude-.2)
+			sample(DRUM_HEAVY_KICK, amp = amplitude-.2) 			# Beats 1 and 3
 			sleep(BPM/2)
-			sample(DRUM_SNARE_HARD, amp = amplitude-.2)
+			sample(DRUM_SNARE_HARD, amp = amplitude-.2)				# Beats 2 and 4
 			sleep(BPM/2)
 	elif whichDrumLoop == 1:
 		for i in range(len(CHORDS)):
@@ -281,8 +240,6 @@ def songManager():
 		
 		#measures
 		measures += 1
-		if measures%(len(CHORDS))==0:
-			melodyPlays += 1
 			
 		#melody
 		if measures%(len(CHORDS))==0 and melodyPlays > 0:
