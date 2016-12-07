@@ -210,6 +210,8 @@ whichDrumLoop = random.randint(0, 2)
 MELODY = initializeMelody()
 
 '''INITIALIZE THREADS'''
+#Threads are stored in a list, so that copies of the threads can be
+	#added to the list, and played (since threads can't be restarted)
 background_thread = [ Thread(target=playAccompaniment) ]
 bassLine_thread = [ Thread(target=bassLine) ]
 drum_thread = [ Thread(target=drumLoop) ]
@@ -224,16 +226,16 @@ def songManager():
 	while True:
 
 		#background
-		if measures>1:
+		if measures>1:	# Add accompaniment after 2 measures
 			background_thread.append( Thread(target=playAccompaniment) )
 			background_thread[-1].start()
 		
 		#bassline
-		if measures>0:
+		if measures>0:	# Add chords after 1 measure
 			bassLine_thread.append( Thread(target=bassLine) )
 			bassLine_thread[-1].start()
 		
-		#drums
+		#drums start immediately
 		drum_thread.append( Thread(target=drumLoop) )
 		drum_thread[-1].start()
 		
@@ -241,7 +243,7 @@ def songManager():
 		measures += 1
 			
 		#melody
-		if measures%(len(CHORDS))==0 and measures > 0:
+		if measures%(len(CHORDS))==0 and measures > 0:  #Play the melody occasionally
 			melody_thread.append( Thread(target=playMelody) )
 			melody_thread[-1].start()
 		
