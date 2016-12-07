@@ -210,7 +210,6 @@ whichDrumLoop = random.randint(0, 2)
 MELODY = initializeMelody()
 
 '''INITIALIZE THREADS'''
-scale_thread = [ Thread(target=playScale) ]
 background_thread = [ Thread(target=playAccompaniment) ]
 bassLine_thread = [ Thread(target=bassLine) ]
 drum_thread = [ Thread(target=drumLoop) ]
@@ -242,7 +241,7 @@ def songManager():
 		measures += 1
 			
 		#melody
-		if measures%(len(CHORDS))==0 and melodyPlays > 0:
+		if measures%(len(CHORDS))==0 and measures > 0:
 			melody_thread.append( Thread(target=playMelody) )
 			melody_thread[-1].start()
 		
